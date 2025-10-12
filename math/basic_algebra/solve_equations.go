@@ -1,4 +1,4 @@
-package math
+package basic_algebra
 
 import (
 	"errors"
