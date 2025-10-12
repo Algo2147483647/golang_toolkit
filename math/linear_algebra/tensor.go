@@ -1,4 +1,4 @@
-package math
+package linear_algebra
 
 import "reflect"
 
