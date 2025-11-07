@@ -1,4 +1,4 @@
-module golang_toolkit
+module github.com/Algo2147483647/golang_toolkit
 
 go 1.24.6
 

@@ -4,3 +4,6 @@ type Graph interface {
 	GetNodes() []Node
 	GetEdges() []Edge
 }
+
+type GraphBase struct {
+}
