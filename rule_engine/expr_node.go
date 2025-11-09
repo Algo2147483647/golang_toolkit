@@ -6,10 +6,9 @@ import (
 
 // ExprNode is the base structure for expression nodes in the rule engine.
 type ExprNode struct {
-	Operator string      // The operator of the expression
-	Value    interface{} // The value
-	Left     *ExprNode   // Left operand
-	Right    *ExprNode   // Right operand
+	Operator     string      // The operator of the expression
+	Value        interface{} // The value
+	ExprNodeList []*ExprNode
 }
 
 // Evaluate evaluates the expression node with given context (variables)
@@ -30,11 +29,11 @@ func (n *ExprNode) Evaluate(context map[string]interface{}) (interface{}, error)
 
 	// Handle unary operators
 	if n.Operator == OpNot {
-		if n.Right == nil {
+		if n.ExprNodeList[1] == nil {
 			return nil, fmt.Errorf("right operand required for operator: %s", n.Operator)
 		}
 
-		rightValue, err := n.Right.Evaluate(context)
+		rightValue, err := n.ExprNodeList[1].Evaluate(context)
 		if err != nil {
 			return nil, err
 		}
@@ -48,16 +47,16 @@ func (n *ExprNode) Evaluate(context map[string]interface{}) (interface{}, error)
 	}
 
 	// Handle binary operators
-	if n.Left == nil || n.Right == nil {
+	if n.ExprNodeList[0] == nil || n.ExprNodeList[1] == nil {
 		return nil, fmt.Errorf("both operands required for operator: %s", n.Operator)
 	}
 
-	leftValue, err := n.Left.Evaluate(context)
+	leftValue, err := n.ExprNodeList[0].Evaluate(context)
 	if err != nil {
 		return nil, err
 	}
 
-	rightValue, err := n.Right.Evaluate(context)
+	rightValue, err := n.ExprNodeList[1].Evaluate(context)
 	if err != nil {
 		return nil, err
 	}
@@ -90,12 +89,8 @@ func (n *ExprNode) Evaluate(context map[string]interface{}) (interface{}, error)
 
 // calculateArithmetic performs arithmetic operations
 func calculateArithmetic(left, right interface{}, operator string) (interface{}, error) {
-	leftFloat, leftOK := toFloat64(left)
-	rightFloat, rightOK := toFloat64(right)
-
-	if !leftOK || !rightOK {
-		return nil, fmt.Errorf("arithmetic operations require numeric operands")
-	}
+	leftFloat := left.(float64)
+	rightFloat := right.(float64)
 
 	switch operator {
 	case OpAdd:
@@ -129,16 +124,15 @@ func NewValueNode(value interface{}) *ExprNode {
 // NewBinaryNode creates a new binary operation node
 func NewBinaryNode(operator string, left, right *ExprNode) *ExprNode {
 	return &ExprNode{
-		Operator: operator,
-		Left:     left,
-		Right:    right,
+		Operator:     operator,
+		ExprNodeList: []*ExprNode{left, right},
 	}
 }
 
 // NewUnaryNode creates a new unary operation node
 func NewUnaryNode(operator string, right *ExprNode) *ExprNode {
 	return &ExprNode{
-		Operator: operator,
-		Right:    right,
+		Operator:     operator,
+		ExprNodeList: []*ExprNode{right},
 	}
 }
