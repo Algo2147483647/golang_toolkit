@@ -60,3 +60,7 @@ func CombineDateAndClock(date, clock time.Time) time.Time {
 		date.Location(),
 	)
 }
+
+func EndOfDay(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 23, 59, 59, 999999999, t.Location())
+}
