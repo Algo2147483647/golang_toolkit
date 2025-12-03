@@ -6,16 +6,15 @@ import (
 	"fmt"
 	"html/template"
 	"strings"
-	textTemplate "text/template"
 	"time"
 )
 
-func TemplateParse(ctx context.Context, template string, params map[string]interface{}, funcMap textTemplate.FuncMap) (string, error) {
+func TemplateParse(ctx context.Context, templateStr string, params map[string]interface{}, funcMap template.FuncMap) (string, error) {
 	if params == nil {
 		params = make(map[string]interface{})
 	}
 
-	tmpl, err := textTemplate.New("template").Funcs(funcMap).Parse(template)
+	tmpl, err := template.New("template").Funcs(funcMap).Parse(templateStr)
 	if err != nil {
 		return "", fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -28,14 +27,17 @@ func TemplateParse(ctx context.Context, template string, params map[string]inter
 	return buf.String(), nil
 }
 
-func GetBasicTemplateFuncMap() template.FuncMap {
-	return textTemplate.FuncMap{
-		"now":     time.Now,
-		"toUpper": strings.ToUpper,
-		"toLower": strings.ToLower,
-		"trim":    strings.TrimSpace,
-		"join":    strings.Join,
-		"split":   strings.Split,
+func GetBasicFuncMap() template.FuncMap {
+	return template.FuncMap{
+		"now":       time.Now,
+		"toLower":   strings.ToLower,
+		"toUpper":   strings.ToUpper,
+		"trim":      strings.TrimSpace,
+		"contains":  strings.Contains,
+		"hasPrefix": strings.HasPrefix,
+		"hasSuffix": strings.HasSuffix,
+		"split":     strings.Split,
+		"join":      strings.Join,
 
 		"formatTime": func(t time.Time, layout string) string {
 			return t.Format(layout)
@@ -74,7 +76,6 @@ func GetBasicTemplateFuncMap() template.FuncMap {
 			return string(b), nil
 		},
 
-		// 将任意值转换为格式化的 JSON 字符串（带缩进）
 		"jsonPretty": func(v interface{}) (string, error) {
 			b, err := json.MarshalIndent(v, "", "  ")
 			if err != nil {
@@ -83,7 +84,6 @@ func GetBasicTemplateFuncMap() template.FuncMap {
 			return string(b), nil
 		},
 
-		// 将 JSON 字符串解析为 map[string]interface{}
 		"jsonParse": func(s string) (map[string]interface{}, error) {
 			var result map[string]interface{}
 			if err := json.Unmarshal([]byte(s), &result); err != nil {
@@ -92,7 +92,6 @@ func GetBasicTemplateFuncMap() template.FuncMap {
 			return result, nil
 		},
 
-		// 将 JSON 字符串解析为 slice
 		"jsonParseArray": func(s string) ([]interface{}, error) {
 			var result []interface{}
 			if err := json.Unmarshal([]byte(s), &result); err != nil {
@@ -101,7 +100,6 @@ func GetBasicTemplateFuncMap() template.FuncMap {
 			return result, nil
 		},
 
-		// 检查一个值是否可以转换为有效的 JSON
 		"jsonValid": func(v interface{}) bool {
 			_, err := json.Marshal(v)
 			return err == nil
