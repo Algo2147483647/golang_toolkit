@@ -2,7 +2,6 @@ package event_model
 
 import (
 	"context"
-	"errors"
 )
 
 type ECA struct {
@@ -11,30 +10,35 @@ type ECA struct {
 	Actions    []Action    `json:"action"`
 }
 
-func (eca *ECA) Work(ctx context.Context, req interface{}) error {
+func (eca *ECA) EventTrigger(ctx context.Context, req interface{}) bool {
 	pass := false
 	for _, event := range eca.Events {
-		if event.IsTriggered(ctx, req) {
+		if event.IsTrigger(ctx, req) {
 			pass = true
 		}
 	}
+	return pass
+}
 
-	if !pass {
-		return errors.New("no event triggered")
-	}
-
+func (eca *ECA) ConditionPass(ctx context.Context, req interface{}) (bool, error) {
 	for _, condition := range eca.Conditions {
-		if !condition.Check() {
-			return errors.New("condition check failed")
+		pass, err := condition.Check()
+		if err != nil {
+			return false, err
+		} else if !pass {
+			return false, nil
 		}
 	}
 
+	return true, nil
+}
+
+func (eca *ECA) ActionExecute() error {
 	for _, action := range eca.Actions {
 		err := action.Execute()
 		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
