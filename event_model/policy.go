@@ -1,5 +1,7 @@
 package event_model
 
 type Policy struct {
-	Rules []*Rule `json:"rules"`
+	Key   string                 `json:"key"`
+	Rules []*Rule                `json:"rules"`
+	Data  map[string]interface{} `json:"data"`
 }

@@ -1,9 +1,10 @@
 package event_model
 
 type Rule struct {
-	Events     []Event     `json:"event"`
-	Conditions []Condition `json:"condition"`
-	Actions    []Action    `json:"action"`
-	Pre        []*Rule     `json:"pre"`
-	Post       []*Rule     `json:"post"`
+	ECA
+	Key    string                 `json:"key"`
+	Pre    []*Rule                `json:"pre"`
+	Post   []*Rule                `json:"post"`
+	Policy *Policy                `json:"policy"`
+	Data   map[string]interface{} `json:"data"`
 }
