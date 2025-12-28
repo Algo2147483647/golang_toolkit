@@ -11,26 +11,22 @@ type ECA struct {
 }
 
 func (eca *ECA) EventTrigger(ctx context.Context, req interface{}) bool {
-	pass := false
 	for _, event := range eca.Events {
 		if event.IsTrigger(ctx, req) {
-			pass = true
+			return true
 		}
 	}
-	return pass
+	return false
 }
 
-func (eca *ECA) ConditionPass(ctx context.Context, req interface{}) (bool, error) {
+func (eca *ECA) ConditionPass(ctx context.Context, req interface{}) bool {
 	for _, condition := range eca.Conditions {
-		pass, err := condition.Check()
-		if err != nil {
-			return false, err
-		} else if !pass {
-			return false, nil
+		if !condition.Check() {
+			return false
 		}
 	}
 
-	return true, nil
+	return true
 }
 
 func (eca *ECA) ActionExecute() error {

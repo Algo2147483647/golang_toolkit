@@ -1,5 +1,5 @@
 package event_model
 
 type Condition interface {
-	Check() (bool, error)
+	Check() bool
 }
