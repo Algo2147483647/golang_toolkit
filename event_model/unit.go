@@ -33,7 +33,8 @@ type UnitInstance struct {
 }
 
 const (
-	UnitStateNotStart      = "not_start"
-	UnitStateRunning       = "running"
-	UnitStateConditionPass = "condition_pass"
+	UnitStateNotStarted    = "not_started"
+	UnitStateInProgress    = "in_progress"
+	UnitStateConditionPass = "condition_passed"
+	UnitStateCompleted     = "completed"
 )

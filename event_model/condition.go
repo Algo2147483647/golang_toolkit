@@ -4,10 +4,12 @@ import "github.com/Algo2147483647/golang_toolkit/rule_engine"
 
 type Condition interface {
 	IsPass() bool
+	GetAttributes() []string
 }
 
 type ConditionBase struct {
-	Node rule_engine.NodeIf `json:"node"`
+	Attributes []string           `json:"attributes"`
+	Node       rule_engine.NodeIf `json:"node"`
 }
 
 func (c *ConditionBase) IsPass() bool {
@@ -16,4 +18,8 @@ func (c *ConditionBase) IsPass() bool {
 		return false
 	}
 	return result.GetValue().(bool)
+}
+
+func (c *ConditionBase) GetAttributes() []string {
+	return c.Attributes
 }

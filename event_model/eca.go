@@ -2,12 +2,37 @@ package event_model
 
 import (
 	"context"
+	"github.com/Algo2147483647/golang_toolkit/common"
 )
 
 type ECA struct {
 	Events     []Event     `json:"event"`
 	Conditions []Condition `json:"condition"`
 	Actions    []Action    `json:"action"`
+}
+
+func (eca *ECA) Check() bool {
+	for _, event := range eca.Events {
+		attrsKeys := common.GetKeys(event.GetAttributes())
+
+		for _, cond := range eca.Conditions {
+			for _, attr := range attrsKeys {
+				if !common.Contains(cond.GetAttributes(), attr) {
+					return false
+				}
+			}
+		}
+
+		for _, action := range eca.Actions {
+			for _, attr := range attrsKeys {
+				if !common.Contains(action.GetAttributes(), attr) {
+					return false
+				}
+			}
+		}
+	}
+
+	return true
 }
 
 func (eca *ECA) EventTrigger(ctx context.Context, req interface{}) bool {
