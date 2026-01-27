@@ -3,87 +3,73 @@ package rule_engine
 import (
 	"fmt"
 	"reflect"
-	"strings"
 )
+
+type OperatorIf interface {
+	GetType() string
+	Evaluate(valueList ...ValueIf) (ValueIf, error)
+}
 
 // Operator type definitions
 const (
-	OpEqual        = "="
-	OpNotEqual     = "!="
-	OpLessThan     = "<"
-	OpLessEqual    = "<="
-	OpGreaterThan  = ">"
-	OpGreaterEqual = ">="
-	OpAnd          = "&&"
-	OpOr           = "||"
-	OpNot          = "!"
-	OpAdd          = "+"
-	OpSubtract     = "-"
-	OpMultiply     = "*"
-	OpDivide       = "/"
-	OpMod          = "%"
-	OpIn           = "in"
+	OpTypeEqual        = "="
+	OpTypeNotEqual     = "!="
+	OpTypeLessThan     = "<"
+	OpTypeLessEqual    = "<="
+	OpTypeGreaterThan  = ">"
+	OpTypeGreaterEqual = ">="
+	OpTypeAnd          = "&&"
+	OpTypeOr           = "||"
+	OpTypeNot          = "!"
+	OpTypeAdd          = "+"
+	OpTypeSubtract     = "-"
+	OpTypeMultiply     = "*"
+	OpTypeDivide       = "/"
+	OpTypeMod          = "%"
+	OpTypeIn           = "in"
 )
 
-// IsComparisonOperator checks if the operator is a comparison operator
-func IsComparisonOperator(op string) bool {
-	switch op {
-	case OpEqual, OpNotEqual, OpLessThan, OpLessEqual, OpGreaterThan, OpGreaterEqual, OpIn:
-		return true
-	default:
-		return false
+type OperatorBase struct {
+	Type string
+}
+
+func NewOperatorBase(operator string) *OperatorBase {
+	return &OperatorBase{
+		Type: operator,
 	}
 }
 
-// IsLogicalOperator checks if the operator is a logical operator
-func IsLogicalOperator(op string) bool {
-	switch op {
-	case OpAnd, OpOr, OpNot:
-		return true
-	default:
-		return false
-	}
+func (o *OperatorBase) GetType() string {
+	return o.Type
 }
-
-// IsArithmeticOperator checks if the operator is an arithmetic operator
-func IsArithmeticOperator(op string) bool {
-	switch op {
-	case OpAdd, OpSubtract, OpMultiply, OpDivide, OpMod:
-		return true
-	default:
-		return false
-	}
-}
-
-// EvaluateOperators evaluates two values with the given operator
-func EvaluateOperators(left, right interface{}, operator string) (bool, error) {
-	switch operator {
-	case OpEqual:
-		return reflect.DeepEqual(left, right), nil
-	case OpNotEqual:
-		return !reflect.DeepEqual(left, right), nil
-	case OpLessThan:
-	case OpLessEqual:
-	case OpGreaterThan:
-	case OpGreaterEqual:
-	case OpIn:
-		return inOperator(left, right)
-	case OpAnd:
-		leftBool, ok := left.(bool)
+func (o *OperatorBase) Evaluate(valueList ...ValueIf) (ValueIf, error) {
+	switch o.GetType() {
+	case OpTypeEqual:
+		return reflect.DeepEqual(valueList[0], valueList[1]), nil
+	case OpTypeNotEqual:
+		return !reflect.DeepEqual(valueList[0], valueList[1]), nil
+	case OpTypeLessThan:
+	case OpTypeLessEqual:
+	case OpTypeGreaterThan:
+	case OpTypeGreaterEqual:
+	case OpTypeIn:
+		return inOperator(valueList[0], valueList[1])
+	case OpTypeAnd:
+		leftBool, ok := valueList[0].(bool)
 		if !ok {
 			return false, fmt.Errorf("left operand of && must be boolean")
 		}
-		rightBool, ok := right.(bool)
+		rightBool, ok := valueList[1].(bool)
 		if !ok {
 			return false, fmt.Errorf("right operand of && must be boolean")
 		}
 		return leftBool && rightBool, nil
-	case OpOr:
-		leftBool, ok := left.(bool)
+	case OpTypeOr:
+		leftBool, ok := valueList[0].(bool)
 		if !ok {
 			return false, fmt.Errorf("left operand of || must be boolean")
 		}
-		rightBool, ok := right.(bool)
+		rightBool, ok := valueList[1].(bool)
 		if !ok {
 			return false, fmt.Errorf("right operand of || must be boolean")
 		}
@@ -92,27 +78,4 @@ func EvaluateOperators(left, right interface{}, operator string) (bool, error) {
 		return false, fmt.Errorf("unsupported operator: %s", operator)
 	}
 	return false, nil
-}
-
-// inOperator checks if left value is in right value (which should be a slice or array)
-func inOperator(left, right interface{}) (bool, error) {
-	rightValue := reflect.ValueOf(right)
-	switch rightValue.Kind() {
-	case reflect.Slice, reflect.Array:
-		for i := 0; i < rightValue.Len(); i++ {
-			if reflect.DeepEqual(left, rightValue.Index(i).Interface()) {
-				return true, nil
-			}
-		}
-		return false, nil
-	case reflect.String:
-		leftStr, ok := left.(string)
-		if !ok {
-			return false, fmt.Errorf("'in' operator with string right operand requires left operand to be string")
-		}
-		rightStr := rightValue.String()
-		return strings.Contains(rightStr, leftStr), nil
-	default:
-		return false, fmt.Errorf("'in' operator not supported for right operand type: %v", rightValue.Kind())
-	}
 }

@@ -1,22 +1,31 @@
 package rule_engine
 
-type Value interface {
+type ValueIf interface {
+	GetType() string
+	GetValue() interface{}
+	SetValue(value interface{})
 }
 
 const (
-	ValueTypeString = iota
-	ValueTypeInt
-	ValueTypeFloat
-	ValueTypeBool
-	ValueTypeArray
-	ValueTypeObject
+	ValueTypeString  = "string"
+	ValueTypeFloat64 = "float64"
+	ValueTypeBool    = "bool"
+	ValueTypeArray   = "array"
+	ValueTypeObject  = "object"
 )
 
 type ValueBase struct {
-	Type  int
+	Type  string
+	ID    string
 	Value interface{}
 }
 
-func NewValueBase(value interface{}) *ValueBase {
-	return &ValueBase{}
+func (v *ValueBase) GetType() string {
+	return v.Type
+}
+func (v *ValueBase) GetValue() interface{} {
+	return v.Value
+}
+func (v *ValueBase) SetValue(value interface{}) {
+	v.Value = value
 }
