@@ -3,20 +3,21 @@ package event_model
 import "context"
 
 type Event interface {
-	GetEventType() string
-	GetPayload() interface{}
+	GetType() string
+	GetAttributes() map[string]interface{}
 	IsTrigger(ctx context.Context, req interface{}) bool
 }
 
 type EventBase struct {
+	Type string
 }
 
-func (e *EventBase) GetEventType() string {
-	return "EventBase"
+func (e *EventBase) GetType() string {
+	return e.Type
 }
 
-func (e *EventBase) GetPayload() interface{} {
-	return nil
+func (e *EventBase) GetAttributes() map[string]interface{} {
+	return map[string]interface{}{}
 }
 
 func (e *EventBase) IsTrigger(ctx context.Context, req interface{}) bool {

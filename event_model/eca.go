@@ -21,7 +21,7 @@ func (eca *ECA) EventTrigger(ctx context.Context, req interface{}) bool {
 
 func (eca *ECA) ConditionPass(ctx context.Context, req interface{}) bool {
 	for _, condition := range eca.Conditions {
-		if !condition.Check() {
+		if !condition.IsPass() {
 			return false
 		}
 	}
