@@ -145,27 +145,6 @@ func (o *OperatorBase) Evaluate(valueList ...ValueIf) (ValueIf, error) {
 			return nil, err
 		}
 		return &ValueBase{Type: getValueType(result), Value: result}, nil
-	case OpTypeContains:
-		str, ok1 := getValue(valueList[0]).(string)
-		element, ok2 := getValue(valueList[1]).(string)
-		if !ok1 || !ok2 {
-			return nil, fmt.Errorf("both operands of contains must be strings")
-		}
-		return &ValueBase{Type: ValueTypeBool, Value: contains(str, element)}, nil
-	case OpTypeStartsWith:
-		str, ok1 := getValue(valueList[0]).(string)
-		prefix, ok2 := getValue(valueList[1]).(string)
-		if !ok1 || !ok2 {
-			return nil, fmt.Errorf("both operands of startsWith must be strings")
-		}
-		return &ValueBase{Type: ValueTypeBool, Value: startsWith(str, prefix)}, nil
-	case OpTypeEndsWith:
-		str, ok1 := getValue(valueList[0]).(string)
-		suffix, ok2 := getValue(valueList[1]).(string)
-		if !ok1 || !ok2 {
-			return nil, fmt.Errorf("both operands of endsWith must be strings")
-		}
-		return &ValueBase{Type: ValueTypeBool, Value: endsWith(str, suffix)}, nil
 	case OpTypeXor:
 		leftBool, ok := getValue(valueList[0]).(bool)
 		if !ok {
@@ -212,8 +191,6 @@ func (o *OperatorBase) Evaluate(valueList ...ValueIf) (ValueIf, error) {
 			return nil, err
 		}
 		return &ValueBase{Type: getValueType(result), Value: result}, nil
-	case OpTypeNop:
-		return valueList[0], nil
 	default:
 		return nil, fmt.Errorf("unsupported operator: %s", o.GetType())
 	}
@@ -233,14 +210,10 @@ func getValueType(v interface{}) string {
 		return ValueTypeBool
 	case string:
 		return ValueTypeString
-	case int:
-		return ValueTypeInt
 	case float64:
 		return ValueTypeFloat64
 	case int64:
 		return ValueTypeInt64
-	case uint:
-		return ValueTypeUint
 	case uint64:
 		return ValueTypeUint64
 	case []interface{}:
@@ -248,7 +221,7 @@ func getValueType(v interface{}) string {
 	case map[string]interface{}:
 		return ValueTypeMap
 	default:
-		return ValueTypeObject
+		return ValueTypeNull
 	}
 }
 
