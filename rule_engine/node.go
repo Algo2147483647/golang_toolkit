@@ -8,8 +8,8 @@ type NodeIf interface {
 }
 
 const (
-	NodeTypeExpr  = "expr_node"
-	NodeTypeValue = "value_node"
+	NodeTypeExpr  = "expr"
+	NodeTypeValue = "value"
 )
 
 // ExprNode is the base structure for expression nodes in the rule engine.
