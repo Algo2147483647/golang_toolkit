@@ -1,4 +1,4 @@
-package event_model
+package eca
 
 import "github.com/Algo2147483647/golang_toolkit/rule_engine"
 

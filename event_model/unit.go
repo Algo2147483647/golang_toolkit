@@ -1,9 +1,12 @@
 package event_model
 
-import "github.com/Algo2147483647/golang_toolkit/math/graph"
+import (
+	"github.com/Algo2147483647/golang_toolkit/event_model/eca"
+	"github.com/Algo2147483647/golang_toolkit/math/graph"
+)
 
 type Unit struct {
-	ECA
+	eca.ECA
 	Key    string                 `json:"key"`
 	Pre    []*Unit                `json:"pre"`
 	Post   []*Unit                `json:"post"`

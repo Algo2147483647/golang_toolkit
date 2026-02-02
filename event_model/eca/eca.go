@@ -1,4 +1,4 @@
-package event_model
+package eca
 
 import (
 	"context"
