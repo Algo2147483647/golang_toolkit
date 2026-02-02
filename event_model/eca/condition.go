@@ -1,10 +1,13 @@
 package eca
 
-import "github.com/Algo2147483647/golang_toolkit/rule_engine"
+import (
+	"context"
+	"github.com/Algo2147483647/golang_toolkit/rule_engine"
+)
 
 type Condition interface {
-	IsPass() bool
-	GetAttributes() []string
+	IsPass(ctx context.Context) bool
+	GetAttributes(ctx context.Context) []string
 }
 
 type ConditionBase struct {
@@ -12,7 +15,7 @@ type ConditionBase struct {
 	Node       rule_engine.NodeIf `json:"node"`
 }
 
-func (c *ConditionBase) IsPass() bool {
+func (c *ConditionBase) IsPass(ctx context.Context) bool {
 	result, err := c.Node.Evaluate()
 	if err != nil {
 		return false
@@ -20,6 +23,6 @@ func (c *ConditionBase) IsPass() bool {
 	return result.GetValue().(bool)
 }
 
-func (c *ConditionBase) GetAttributes() []string {
+func (c *ConditionBase) GetAttributes(ctx context.Context) []string {
 	return c.Attributes
 }

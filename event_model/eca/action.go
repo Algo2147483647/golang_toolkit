@@ -1,8 +1,10 @@
 package eca
 
+import "context"
+
 type Action interface {
-	Execute() error
-	GetAttributes() []string
+	Execute(ctx context.Context) error
+	GetAttributes(ctx context.Context) []string
 }
 
 type ActionBase struct {
@@ -10,10 +12,10 @@ type ActionBase struct {
 	Params     map[string]interface{}
 }
 
-func (c *ActionBase) GetAttributes() []string {
-	return c.Attributes
+func (c *ActionBase) Execute(ctx context.Context) error {
+	return nil
 }
 
-func (c *ActionBase) Execute() error {
-	return nil
+func (c *ActionBase) GetAttributes(ctx context.Context) []string {
+	return c.Attributes
 }

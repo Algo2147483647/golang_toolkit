@@ -11,13 +11,13 @@ type ECA struct {
 	Actions    []Action    `json:"action"`
 }
 
-func (eca *ECA) Check() bool {
+func (eca *ECA) Check(ctx context.Context) bool {
 	for _, event := range eca.Events {
-		attrsKeys := common.GetKeys(event.GetAttributes())
+		attrsKeys := common.GetKeys(event.GetAttributes(ctx))
 
 		for _, cond := range eca.Conditions {
 			for _, attr := range attrsKeys {
-				if !common.Contains(cond.GetAttributes(), attr) {
+				if !common.Contains(cond.GetAttributes(ctx), attr) {
 					return false
 				}
 			}
@@ -25,7 +25,7 @@ func (eca *ECA) Check() bool {
 
 		for _, action := range eca.Actions {
 			for _, attr := range attrsKeys {
-				if !common.Contains(action.GetAttributes(), attr) {
+				if !common.Contains(action.GetAttributes(ctx), attr) {
 					return false
 				}
 			}
@@ -46,7 +46,7 @@ func (eca *ECA) EventTrigger(ctx context.Context, req interface{}) bool {
 
 func (eca *ECA) ConditionPass(ctx context.Context, req interface{}) bool {
 	for _, condition := range eca.Conditions {
-		if !condition.IsPass() {
+		if !condition.IsPass(ctx) {
 			return false
 		}
 	}
@@ -54,9 +54,9 @@ func (eca *ECA) ConditionPass(ctx context.Context, req interface{}) bool {
 	return true
 }
 
-func (eca *ECA) ActionExecute() error {
+func (eca *ECA) ActionExecute(ctx context.Context) error {
 	for _, action := range eca.Actions {
-		err := action.Execute()
+		err := action.Execute(ctx)
 		if err != nil {
 			return err
 		}
