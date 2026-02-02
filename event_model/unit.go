@@ -10,7 +10,7 @@ type Unit struct {
 	Key    string                 `json:"key"`
 	Pre    []*Unit                `json:"pre"`
 	Post   []*Unit                `json:"post"`
-	Params map[string]interface{} `json:"data"`
+	Params map[string]interface{} `json:"params"`
 }
 
 func UnitsToNodes(units []*Unit) []graph.Node {
